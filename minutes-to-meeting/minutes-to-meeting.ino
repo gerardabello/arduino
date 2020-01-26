@@ -47,14 +47,31 @@ void setup() {
   Serial.write(0);
 }
 
-const int DELAY = 5;
 
 void writeEmpty() {
   digitalWrite(D1, HIGH);
   digitalWrite(D2, HIGH);
   digitalWrite(D3, HIGH);
   digitalWrite(D4, HIGH); 
+
+  digitalWrite(pinA, LOW);   
+  digitalWrite(pinB, LOW);   
+  digitalWrite(pinC, LOW);   
+  digitalWrite(pinD, LOW);   
+  digitalWrite(pinE, LOW);   
+  digitalWrite(pinF, LOW);   
+  digitalWrite(pinG, LOW);   
 }
+
+void writeDashes() {
+  digitalWrite(D1, LOW);
+  digitalWrite(D2, LOW);
+  digitalWrite(D3, LOW);
+  digitalWrite(D4, LOW); 
+  digitalWrite(pinG, HIGH);     
+}
+
+int DELAY = 2;
 
 void writeNumber(int number) {
   writeNumberDigit(D1, number % 10);
@@ -65,13 +82,12 @@ void writeNumber(int number) {
   delay(DELAY);
   writeNumberDigit(D4, number / 1000 % 10);
   delay(DELAY);
+  writeEmpty();
 }
 
 void writeNumberDigit(int displayIndex, int number) {
-  digitalWrite(D1, HIGH);
-  digitalWrite(D2, HIGH);
-  digitalWrite(D3, HIGH);
-  digitalWrite(D4, HIGH); 
+  writeEmpty();
+
   digitalWrite(displayIndex, LOW); 
 
   switch (number) {
@@ -171,7 +187,7 @@ void writeNumberDigit(int displayIndex, int number) {
 }
 
 long number = millis() / 1000;
-int step = 0;
+int step = -2;
 
 void numberControler() {
   if (Serial.available()) {
@@ -207,10 +223,14 @@ void loop() {
   unsigned long secondsLeft = max(0, (number - currentSeconds));
   unsigned long minutesLeft = secondsLeft / 60;
 
-  if (minutesLeft > 2 || showNumber) {
-    writeNumber(minutesLeft);
-  }else{
-    writeEmpty();
+  if (step == -2) {
+    writeDashes();
+  }else{ 
+    if (minutesLeft > 2 || showNumber) {
+      writeNumber(minutesLeft);
+    }else{
+      writeEmpty();
+    }
   }
 
   toggleShowNumber();
