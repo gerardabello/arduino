@@ -77,16 +77,18 @@ const getCalendars = auth => new Promise(resolve => {
 const getEventsInCalendar = (auth, calendarId) => new Promise(resolve => {
   const calendar = google.calendar({version: 'v3', auth});
 
+  const now = new Date()
+  const fiveHoursAgo = new Date(now.getTime() - 5 * 60 * 60 * 1000)
+
   calendar.events.list({
     calendarId,
-    timeMin: (new Date()).toISOString(),
-    maxResults: 100,
+    timeMin: (fiveHoursAgo).toISOString(),
+    maxResults: 20,
     singleEvents: true,
     orderBy: 'startTime',
   }, (err, res) => {
     if (err) return console.log('The API returned an error: ' + err);
     const events = res.data.items;
-    console.log(events)
     resolve(events.filter(e => e.status === 'confirmed')
       .filter(e => e.start.dateTime != null)
       .map(e => ({summary:e.summary, start: new Date(e.start.dateTime), end: new Date(e.end.dateTime)

@@ -1,5 +1,7 @@
 import SerialPort from 'serialport'
 
+const serialport = new SerialPort('/dev/cu.usbmodem14201')
+
 function sleep(ms) {
   return new Promise(resolve => setTimeout(resolve, ms))
 }
@@ -25,9 +27,10 @@ const sendValue = async (serialport, value) => {
   serialport.write([202])
 }
 
-export const sendValueToArduino = async (value) => {
-  const serialport = new SerialPort('/dev/cu.usbmodem14201')
 
+let initDone = false
+
+const init = async () => {
   // This will restart the arduino board
   serialport.write([0])
 
@@ -38,6 +41,14 @@ export const sendValueToArduino = async (value) => {
     if (serialport.read() != null) break
 
     await sleep(50)
+  }
+
+  initDone = true
+}
+
+export const sendValueToArduino = async (value) => {
+  if (!initDone) {
+    await init()
   }
 
   await sendValue(serialport, value)
