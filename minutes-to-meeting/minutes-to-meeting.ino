@@ -15,17 +15,18 @@
 
 // Pin 2-8 is connected to the 7 segments of the display.
 
-int pinA = 6;
-int pinB = 7;
-int pinC = 8;
-int pinD = 9;
-int pinE = 10;
-int pinF = 11;
-int pinG = 12;
-int D1 = 2;
-int D2 = 3;
-int D3 = 4;
-int D4 = 5;
+int pinA = 2;
+int pinB = 3;
+int pinC = 4;
+int pinD = 5;
+int pinE = 6;
+int pinF = 7;
+int pinG = 8;
+int D1 = 9;
+int D2 = 10;
+int D3 = 11;
+int D4 = 12;
+
 
 // the setup routine runs once when you press reset:
 void setup() {                

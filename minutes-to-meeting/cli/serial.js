@@ -1,6 +1,6 @@
 import SerialPort from 'serialport'
 
-const serialport = new SerialPort('/dev/cu.usbmodem14201')
+const serialport = new SerialPort('/dev/cu.usbserial-1420')
 
 function sleep(ms) {
   return new Promise(resolve => setTimeout(resolve, ms))

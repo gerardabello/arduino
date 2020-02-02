@@ -22,10 +22,10 @@ int pinD = 5;
 int pinE = 6;
 int pinF = 7;
 int pinG = 8;
-int D1 = 10;
-int D2 = 11;
-int D3 = 12;
-int D4 = 13;
+int D1 = 9;
+int D2 = 10;
+int D3 = 11;
+int D4 = 12;
 
 // the setup routine runs once when you press reset:
 void setup() {                
@@ -162,7 +162,8 @@ void writeNumberDigit(int displayIndex, int number) {
 // the loop routine runs over and over again forever:
 void loop() {
   while(true) {
-    writeNumber(millis() / 1000);
+    //writeNumber(millis() / 1000);
+    writeNumber(8888);
   }
 }
 
