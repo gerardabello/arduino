@@ -1,10 +1,16 @@
+#!make
+include .env
+export
+
+test:
+	env
 build:
-	arduino-cli compile --fqbn arduino:avr:nano:cpu=atmega328 . 
+	arduino-cli compile --fqbn $(FQBN) . 
 upload:
-	arduino-cli upload -p /dev/cu.usbserial-1420 --fqbn arduino:avr:nano:cpu=atmega328 .
+	arduino-cli upload -p $(PORT) --fqbn $(FQBN) .
 log:
-	cat /dev/cu.usbserial-1420
+	cat $(PORT)
 loghex:
-	od -x < /dev/cu.usbserial-1420
+	od -x < $(PORT)
 
 

@@ -1,5 +1,6 @@
 import {getEvents} from './google-calendar.js'
-import {sendValueToArduino} from './serial.js'
+import Serial from './serial.js'
+import  dotenv from 'dotenv' 
 
 function sleep(ms) {
   return new Promise(resolve => setTimeout(resolve, ms))
@@ -16,17 +17,8 @@ let events
 const updateEventsLoop = async () => {
   while (true) {
   events = await getEvents()
-      //await sleep(15 * 60 * 1000)
-      await sleep(14 * 1000)
+      await sleep(15 * 60 * 1000)
   }
-}
-
-let lastTimeSend
-const setTimeInArduino = async time => {
-  if (lastTimeSend && time.getTime() === lastTimeSend.getTime()) return
-  lastTimeSend = time
-  const secondsToTime = dateSecondsDiff(new Date(), time)
-  await sendValueToArduino(secondsToTime)
 }
 
 // Ignores meeting length. Considers to be in meeting for the first 10 minutes
@@ -51,9 +43,13 @@ const hoursFuture= n => {
   return fiveHoursAgo
 }
 
-const main = async () => {
+const main = async (serial) => {
 
   updateEventsLoop()
+
+  const fail = await serial.init()
+
+  if (fail) return
 
   while (true) {
     if (events) {
@@ -63,14 +59,36 @@ const main = async () => {
         const now = new Date()
         const nextEvent = events.find(e => e.start > now)
         if (nextEvent) {
-          await setTimeInArduino(nextEvent.start)
+          const secondsToTime = dateSecondsDiff(new Date(), nextEvent.start)
+          await serial.sendValue(secondsToTime)
         }
       }
-      await sleep(10 * 1000)
+      await sleep(5 * 1000)
     }
 
     await sleep(100)
   }
 }
 
-main().then(process.exit)
+const errorWrappedMain = () => new Promise((resolve, reject) =>  {
+  dotenv.config({ path: '../.env' })
+    const serial = new Serial(process.env.PORT, reject)
+    main(serial).then(resolve).catch(reject)
+})
+
+const index = async () => {
+  while(true){
+    try {
+      await errorWrappedMain()
+    }catch(e) {
+      console.error(e)
+      await sleep(1 * 1000)
+    }
+  }
+}
+
+
+index().then(process.exit).catch(e => {
+  console.error(e)
+  process.exit()
+})

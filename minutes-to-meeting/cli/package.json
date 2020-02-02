@@ -4,7 +4,11 @@
   "type": "module",
   "main": "index.js",
   "license": "MIT",
+  "scripts": {
+    "start": "node --unhandled-rejections=strict index.js"
+  },
   "dependencies": {
+    "dotenv": "^8.2.0",
     "googleapis": "^39.2.0",
     "serialport": "^8.0.6"
   }

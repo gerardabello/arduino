@@ -187,6 +187,7 @@ void writeNumberDigit(int displayIndex, int number) {
   }
 }
 
+long tempNumber = 0;
 long number = millis() / 1000;
 int step = -2;
 
@@ -194,13 +195,14 @@ void numberControler() {
   if (Serial.available()) {
     unsigned int recievedByte = Serial.read();
     if (recievedByte == 201) {
-      number = millis() / 1000;
+      tempNumber = millis() / 1000;
       step = 0;
     }else if (recievedByte == 202){
       // Number is finished
+      number = tempNumber;
       step = -1;
     }else if (step >= 0){
-      number += recievedByte * pow(200, step);
+      tempNumber += recievedByte * pow(200, step);
       step += 1;
     }
   }

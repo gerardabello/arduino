@@ -1,7 +1,5 @@
 import SerialPort from 'serialport'
 
-const serialport = new SerialPort('/dev/cu.usbserial-1420')
-
 function sleep(ms) {
   return new Promise(resolve => setTimeout(resolve, ms))
 }
@@ -9,48 +7,57 @@ function sleep(ms) {
 // Number base of bytes sent. As byte is max 255, it has to be smaller.
 const BASE = 200
 
-const sendValue = async (serialport, value) => {
+class Serial {
+  constructor(port, onError) {
+    this.serialport = new SerialPort(port)
 
-  // Marks start of data
-  serialport.write([201])
-
-  let sent = 0;
-
-  for (let i = 0; i <= 10; i++) {
-    const byte = (Math.floor((value - sent) % Math.pow(BASE, i + 1))) / Math.pow(BASE, i)
-    sent += byte * Math.pow(BASE, i)
-    serialport.write([byte])
-    await sleep(100)
+    this.serialport.on('error', onError)
   }
 
-  // Marks end of data
-  serialport.write([202])
-}
 
+  async sendValue  ( value) {
+    // Marks start of data
+    this.serialport.write([201])
 
-let initDone = false
+    let sent = 0;
 
-const init = async () => {
-  // This will restart the arduino board
-  serialport.write([0])
+    for (let i = 0; i <= 10; i++) {
+      const byte = (Math.floor((value - sent) % Math.pow(BASE, i + 1))) / Math.pow(BASE, i)
+      sent += byte * Math.pow(BASE, i)
+      this.serialport.write([byte])
+      await sleep(100)
+    }
 
-  await sleep(50)
+    // Marks end of data
+    this.serialport.write([202])
+  }
 
-  // Wait until arduino sends something. This means it will have booted
-  while (true) {
-    if (serialport.read() != null) break
+  async init () {
+    // This will restart the arduino board
+    this.serialport.write([0])
+
+    let i = 0
 
     await sleep(50)
-  }
 
-  initDone = true
+    // Wait until arduino sends something. This means it will have booted
+    while (true) {
+      console.log('Waiting for controller...')
+      if (this.serialport.read() != null) break
+
+      i++
+      if (i > 20) return true
+
+      await sleep(200)
+    }
+
+    return false
+  }
 }
 
-export const sendValueToArduino = async (value) => {
-  if (!initDone) {
-    await init()
-  }
 
-  await sendValue(serialport, value)
-}
+
+export default Serial
+
+
 
