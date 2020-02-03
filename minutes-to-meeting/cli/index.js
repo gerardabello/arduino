@@ -25,11 +25,13 @@ const updateEventsLoop = async () => {
 const currentlyInMeeting = events => {
   const MEETING_LENGTH = 10 * 60 * 1000
   const now = new Date()
-  return events.filter(e => 
+  const currentEvents = events.filter(e => 
     { 
-      return e.start < now && (new Date(e.end.getTime() + MEETING_LENGTH)) > now
+      return e.start < now && (new Date(e.start.getTime() + MEETING_LENGTH)) > now
     }
-  ).length > 0
+  )
+
+  return currentEvents.length > 0
 }
 
 const hoursAgo = n => {
@@ -59,9 +61,12 @@ const main = async (serial) => {
         const now = new Date()
         const nextEvent = events.find(e => e.start > now)
         if (nextEvent) {
+          console.log(`Next event: ${nextEvent.summary}`)
           const secondsToTime = dateSecondsDiff(new Date(), nextEvent.start)
           await serial.sendValue(secondsToTime)
         }
+      }else{
+        console.log('Currently in meeting')
       }
       await sleep(5 * 1000)
     }
