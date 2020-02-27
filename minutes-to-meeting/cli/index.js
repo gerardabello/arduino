@@ -16,8 +16,13 @@ let events
 
 const updateEventsLoop = async () => {
   while (true) {
-  events = await getEvents()
+    try {
+      events = await getEvents()
       await sleep(15 * 60 * 1000)
+    }catch(e) {
+      console.log('Could not fetch google calendar events: ', e)
+      process.exit(1)
+    }
   }
 }
 
@@ -45,13 +50,21 @@ const hoursFuture= n => {
   return fiveHoursAgo
 }
 
-const main = async (serial) => {
-
-  updateEventsLoop()
+const main = async () => {
+  dotenv.config({ path: '../.env' })
+  const serial = new Serial(process.env.PORT, e => {
+    console.log('Error with device connection: ', e)
+    process.exit(1)
+  })
 
   const fail = await serial.init()
 
-  if (fail) return
+  if (fail) {
+    console.error('Could not connect to device')
+    return
+  }
+
+  updateEventsLoop()
 
   while (true) {
     if (events) {
@@ -75,25 +88,7 @@ const main = async (serial) => {
   }
 }
 
-const errorWrappedMain = () => new Promise((resolve, reject) =>  {
-  dotenv.config({ path: '../.env' })
-    const serial = new Serial(process.env.PORT, reject)
-    main(serial).then(resolve).catch(reject)
-})
-
-const index = async () => {
-  while(true){
-    try {
-      await errorWrappedMain()
-    }catch(e) {
-      console.error(e)
-      await sleep(1 * 1000)
-    }
-  }
-}
-
-
-index().then(process.exit).catch(e => {
+main().then(process.exit).catch(e => {
   console.error(e)
   process.exit()
 })

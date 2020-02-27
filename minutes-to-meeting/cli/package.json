@@ -5,7 +5,7 @@
   "main": "index.js",
   "license": "MIT",
   "scripts": {
-    "start": "node --unhandled-rejections=strict index.js"
+    "start": "watch --interval 10 node --unhandled-rejections=strict index.js"
   },
   "dependencies": {
     "dotenv": "^8.2.0",

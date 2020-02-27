@@ -38,17 +38,15 @@ class Serial {
 
     let i = 0
 
-    await sleep(50)
-
     // Wait until arduino sends something. This means it will have booted
     while (true) {
       console.log('Waiting for controller...')
       if (this.serialport.read() != null) break
 
       i++
-      if (i > 20) return true
+      if (i > 5) return true
 
-      await sleep(200)
+      await sleep(1000)
     }
 
     return false
