@@ -15,13 +15,13 @@
 
 // Pin 2-8 is connected to the 7 segments of the display.
 
-int pinA = 2;
-int pinB = 3;
-int pinC = 4;
-int pinD = 5;
+int pinA = 5;
+int pinB = 7;
+int pinC = 2;
+int pinD = 3;
 int pinE = 6;
-int pinF = 7;
-int pinG = 8;
+int pinF = 8;
+int pinG = 4;
 int D1 = 9;
 int D2 = 10;
 int D3 = 11;
@@ -162,8 +162,7 @@ void writeNumberDigit(int displayIndex, int number) {
 // the loop routine runs over and over again forever:
 void loop() {
   while(true) {
-    //writeNumber(millis() / 1000);
-    writeNumber(8888);
+    writeNumber(millis() / 1);
   }
 }
 
